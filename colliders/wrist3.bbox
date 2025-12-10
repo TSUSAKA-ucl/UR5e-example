@@ -1,0 +1,12 @@
+Mesh /home/tsusaka/workspace/ros2/install/ur_description/share/ur_description/meshes/ur5e/collision/convex/wrist3.stl loaded has 73 vn 142 fn
+Mesh Bounding Box OriginalSize 0.075106  0.045814  0.081554
+Mesh Bounding Box Size 0.075106  0.05  0.075106
+Mesh Bounding Box crop 0 0.2 -1
+Mesh Bounding Box scale 1 0.2 1
+Mesh Bounding Box Diag 0.119962 
+Mesh Bounding Box min -0.037479  0.053145  -0.038037
+Mesh Bounding Box max 0.037627  0.098959  0.043517
+Mesh Surface Area is 0.018501
+Mesh Total Len of 213 Edges is 4.210600 Avg Len 0.019768
+Mesh Total Len of 213 Edges is 4.210600 Avg Len 0.019768 (including faux edges))
+Mesh Volume  is 0.000197

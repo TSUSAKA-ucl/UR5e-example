@@ -1,0 +1,12 @@
+Mesh /home/tsusaka/workspace/ros2/install/ur_description/share/ur_description/meshes/ur5e/collision/convex/base.stl loaded has 212 vn 420 fn
+Mesh Bounding Box OriginalSize 0.150978  0.150988  0.099099
+Mesh Bounding Box Size 0.130978  0.130978  0.099099
+Mesh Bounding Box crop 0 0 0
+Mesh Bounding Box scale 1 1 0.5
+Mesh Bounding Box Diag 0.235398 
+Mesh Bounding Box min -0.075479  -0.075508  -0.000000
+Mesh Bounding Box max 0.075499  0.075479  0.099099
+Mesh Surface Area is 0.071767
+Mesh Total Len of 630 Edges is 19.263485 Avg Len 0.030577
+Mesh Total Len of 630 Edges is 19.263485 Avg Len 0.030577 (including faux edges))
+Mesh Volume  is 0.001465
