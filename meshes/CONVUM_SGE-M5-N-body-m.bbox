@@ -1,0 +1,11 @@
+Mesh /home/tsusaka/Test/gjk_worker/Nova2/CONVUM_SGE-M5-N-body-m.stl loaded has 82769 vn 166316 fn
+Mesh Bounding Box SizeX 0.071474  0.083618  0.127758
+Mesh Bounding Box Size 0.065354  0.083618  0.127758
+Mesh Bounding Box crop -1 -1 -1
+Mesh Bounding Box Diag 0.168590 
+Mesh Bounding Box min -0.032677  -0.037183  -0.003100
+Mesh Bounding Box max 0.038797  0.046435  0.124658
+Mesh Surface Area is 0.079431
+Mesh Total Len of 249144 Edges is 260.463501 Avg Len 0.001045
+Mesh Total Len of 249144 Edges is 260.463501 Avg Len 0.001045 (including faux edges))
+Mesh is not 'watertight', no information on volume, barycenter and inertia tensor.

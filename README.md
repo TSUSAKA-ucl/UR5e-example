@@ -54,8 +54,8 @@ This section describes how to create the `urdf.json`, `linkmap.json`,
    ```
    ./a/extract-joint-and-link-tag.sh chain_1.urdf
    ```
-   this will generate `urdfmap.json`, `linkmap.json`, and
-   `update-stub.json` files.
+   this will generate `urdfmap.json` (or `urdfsorted.json`), `linkmap.json`,
+   and `update-stub.json` files.
 8. cut off the unnecessary parts of the joint map from the
    `urdfmap.json` using `./a/cut-joint-map.sh` script.
    for example, if `chain_1.urdf` is selected, run
@@ -84,11 +84,11 @@ This section describes how to create the `urdf.json`, `linkmap.json`,
     the paths will be findable under the `install` folder. If not, you can usually
     find them in the source tree you cloned in step 1.
 11. symlink or copy the mesh files to the `meshes` folder.
-	for example,
-	```
-	mkdir -p meshes
-	cd meshes
-	```
+    for example,
+    ```
+    mkdir -p meshes
+    cd meshes
+    ```
     ```
     URDir=`ros2 pkg prefix ur_description`/share/ur_description
     ```
@@ -96,32 +96,33 @@ This section describes how to create the `urdf.json`, `linkmap.json`,
     ```
     URDir=../Universal_Robots_ROS2_Description
     ```
-	```
-	for path in "${Meshes[@]}"; do
-	  path=`echo $path | sed 's|^package://ur_description/||'`
-	  ln -s $URDir/$path .
-	done
-	```
+    ```
+    for path in "${Meshes[@]}"; do
+      path=`echo $path | sed 's|^package://ur_description/||'`
+      ln -s $URDir/$path .
+    done
+    ```
 12. convert meshes to glTF format using `convert-to-gltf.sh` tool
-	```
-	for file in *.STL *.stl *.DAE *.dae; do
-	  ../a/convert-to-gltf.sh "$file"
-	done
-	cd ..
-	```
-	this will generate glTF files(`.gltf` and `.bin`) for each mesh file
-	under `out` folder.
+    ```
+    for file in *.STL *.stl *.DAE *.dae; do
+      ../a/convert-to-gltf.sh "$file"
+    done
+    cd ..
+    ```
+    this will generate glTF files(`.gltf` and `.bin`) for each mesh file
+    under `out` folder.
 13. make a compact `update.json` using `json-pretty-compact.sh` tool
-	```
-	./a/json-pretty-compact.sh update-stub.json -o update.json -c 90
-	```
-	and edit `update.json` if necessary.
+    ```
+    ./a/json-pretty-compact.sh update-stub.json -o update.json -c 90
+    ```
+    and edit `update.json` if necessary.
 
 14. finally, rename `urdfmap_cut.json` to `urdf.json` and move
-	`urdf.json`, `linkmap.json`, `update.json` and files in `meshes/out/` folder
-	to `public/ur5e/` folder or any other desired folder.
+    `urdf.json`, `linkmap.json`, `update.json` and files in `meshes/out/` folder
+    to `public/ur5e/` folder or any other desired folder.
 
-Now you can use the created files with `robot-loader` and `ik-worker`.
+Now you can use the created files(`urdf.json`, `linkmap.json`, `update.json`)
+and glTF mesh files  with `robot-loader` and `ik-worker`.
 
 ## Creating colliders information and their visualization information
 
@@ -136,4 +137,99 @@ the link meshes are decimated and decomposed into convex parts.
 
 For the former way, please refer to [`HowToMakeShapes_json_file2.md`(in Japanese)](https://github.com/TSUSAKA-ucl/gjk_worker/blob/main/docs/HowToMakeShapes_json_file2.md). For the latter way, please refer to [`HowToMakeShapes_json_file3.md`(in Japanese)](https://github.com/TSUSAKA-ucl/gjk_worker/blob/main/docs/HowToMakeShapes_json_file3.md).
 
-UR robots has the links with simple shapes, so the former way is usually sufficient.
+UR robot has the links with simple shapes, so the former way is usually sufficient.
+
+1. UR5e's description includes DAE files for visualization and STL files for collision.
+   You can use the DAE files to create colliders from bounding boxes. DAE files are easier
+   to understand their shapes than STL files.
+   So first, calculate the bounding boxes from DAE files.
+   ```
+   cd meshes/
+   ../s/boundingBox.sh *.dae
+   ```
+   this creates `.bbx` files for each DAE file.
+2. edit bounding box files if necessary to make them tighter.
+3. create collider files: STL files, PLY files and glTF files for colliders
+   from bounding box files
+   ```
+   ../s/createBboxAll.sh
+   ```
+4. Check if the generated collider is acceptable. `meshlab` has problems when
+   opening DAE files directly from the command line, so you may need to create
+   a project file and open it.
+   ```
+   for dae in *.dae
+   do sed -e "s/TEMPLATE/${dae%.*}/g" template.mlp > "${dae%.*}.mlp"
+      meshlab "${dae%.*}".mlp
+   done
+   ```
+   If ROS's visualization uses STL files instead of DAE files, 
+   meshlab's project file isn't necessary. You can open two STL files directly.
+5. If all colliders are acceptable, create `shapeList.json` file which lists up
+   the collider files for each link.
+   ```
+   ../s/create_shapelist.sh *.bbox.ply > shapeList.json
+   ```
+6. edit `shapeList.json` to sort the links according to the joint order in `urdf.json`.
+   In addition, add tools fixed to the end-link and base plate colliders if necessary.
+   This will result in a file like below:
+   ```
+[
+  [ "table.ply", "base.bbox.ply" ],
+  [ "shoulder.bbox.ply" ],
+  [ "upperarm.bbox.ply" ],
+  [ "forearm.bbox.ply" ],
+  [ "wrist1.bbox.ply" ],
+  [ "wrist2.bbox.ply" ],
+  [ "wrist3.bbox.ply" ],
+  [ "CONVUM_SGE-M5-N-body-m.bbox.ply",
+    "CONVUM_SGE-M5-N-suction-m.bbox.ply"
+  ]
+]
+   ```
+7. create `shapes.json` file from `shapeList.json`
+   ```
+   ../s/ply_loader.js shapeList.json
+   cp -p outout.json shapes.json
+   ```
+   Now you have `shapes.json` file defining colliders for UR5e robot.
+8. write `testPairs.json` file for testing collision detection between links.
+   This file is handwritten because it is difficult to determine which link pairs
+   should be tested for collision automatically. But for many 6-DOF serial robots,
+   following pairs are sufficient:
+   ```json
+   [
+     [0,2],[0,3],[0,4],[0,5],[0,6],[0,7],
+     [1,3],[1,4],[1,5],[1,6],[1,7],
+     [2,4],[2,5],[2,6],[2,7],
+     [3,5],[3,6],[3,7]
+   ]
+   ```
+9. finally, move `shapes.json` and `testPairs.json` to `public/ur5e/` folder
+   or any other desired folder. These two are all that the `cd-worker` needs.
+   But if you want to visualize the colliders in `robot-loader`, you also need
+   glTF files for colliders.
+10. create glTF files for colliders from the collider STL files
+    ```
+    cd meshes/
+    for file in *.bbox.stl; do
+      ../a/convert-to-gltf.sh "$file"
+    done
+    ```
+    STLs have no color information, so add a color and opacity to the
+    glTF files using `set-gltf-color.mjs` tool
+    ```
+    for f in *.bbox.gltf; do
+      node ../../s/set-gltf-color.mjs "$f" --color '#ff0000' --opacity 0.2
+    done
+    cd ..
+    ```
+	move the generated glTF files and bin files in `meshes/out/` folder 
+	to `public/ur5e/` folder or any other desired folder.	
+
+Now you can use the created `shapes.json`, `testPairs.json` files and
+the collider glTF files with `cd-worker` and `robot-loader`.
+
+If the ROS robot description package does not include DAE files for visualization
+but for visualization only STL files, you can add colors to the collider glTF files
+using `set-gltf-color.mjs` tool as described above.
