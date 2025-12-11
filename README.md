@@ -174,18 +174,18 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
    In addition, add tools fixed to the end-link and base plate colliders if necessary.
    This will result in a file like below:
    ```
-[
-  [ "table.ply", "base.bbox.ply" ],
-  [ "shoulder.bbox.ply" ],
-  [ "upperarm.bbox.ply" ],
-  [ "forearm.bbox.ply" ],
-  [ "wrist1.bbox.ply" ],
-  [ "wrist2.bbox.ply" ],
-  [ "wrist3.bbox.ply" ],
-  [ "CONVUM_SGE-M5-N-body-m.bbox.ply",
-    "CONVUM_SGE-M5-N-suction-m.bbox.ply"
-  ]
-]
+   [
+     [ "table.ply", "base.bbox.ply" ],
+     [ "shoulder.bbox.ply" ],
+     [ "upperarm.bbox.ply" ],
+     [ "forearm.bbox.ply" ],
+     [ "wrist1.bbox.ply" ],
+     [ "wrist2.bbox.ply" ],
+     [ "wrist3.bbox.ply" ],
+     [ "CONVUM_SGE-M5-N-body-m.bbox.ply",
+       "CONVUM_SGE-M5-N-suction-m.bbox.ply"
+     ]
+   ]
    ```
 7. create `shapes.json` file from `shapeList.json`
    ```
@@ -219,13 +219,29 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
     STLs have no color information, so add a color and opacity to the
     glTF files using `set-gltf-color.mjs` tool
     ```
+	cd out
     for f in *.bbox.gltf; do
       node ../../s/set-gltf-color.mjs "$f" --color '#ff0000' --opacity 0.2
     done
-    cd ..
+    cd ../..
     ```
 	move the generated glTF files and bin files in `meshes/out/` folder 
 	to `public/ur5e/` folder or any other desired folder.	
+11. modify `update.json` to draw the tool's collider if necessary.
+	```
+	node ./addToolColliders.js
+	```
+	or 
+	```
+	node ./addToolColliders.js update.json wrist_3_link CONVUM_SGE-M5-N-body-m.bbox.gltf CONVUM_SGE-M5-N-suction-m.bbox.gltf
+	```
+	These commands create the same `update_with_tool.json` file.
+	Then overwrite `public/ur5e/update.json` file with it.  
+	**NOTE:**  
+	Tools are not defined in `linkmap.json`, so they are written into
+	`shapes.json` and `update.json` as shapes **in the coordinate system
+	of the LINK** to which they are attached, **not in the glTF visual's origin**
+	of the link.
 
 Now you can use the created `shapes.json`, `testPairs.json` files and
 the collider glTF files with `cd-worker` and `robot-loader`.

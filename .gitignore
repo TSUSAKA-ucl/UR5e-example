@@ -13,6 +13,7 @@ urdfmap.json
 linkmap.json
 update-stub.json
 update.json
+update-with-tools-collider.json
 output_compact.json
 urdfmap_cmp.json
 urdfmap_cut.json
