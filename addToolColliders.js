@@ -1,12 +1,18 @@
 // add tools collider shapes to wrist_3_link
 const fs = require('fs');
 
-const additionalToolColliderFilenames = process.argv.slice(4) || [
-  'CONVUM_SGE-M5-N-tool-1-m.bbox.gltf',
-  'CONVUM_SGE-M5-N-tool-2-m.bbox.gltf',
-];
-
+const additionalToolColliderFilenames =
+      process.argv.slice(4) || process.argv.slice(4).length===0 ?
+      [
+	'CONVUM_SGE-M5-N-body-m.bbox.gltf',
+	'CONVUM_SGE-M5-N-suction-m.bbox.gltf',
+      ] :
+      process.argv.slice(4);
 const wrist3LinkName = process.argv[3] || 'wrist_3_link';
+
+console.log('additionalToolColliderFilenames',additionalToolColliderFilenames,
+	    'are added to',wrist3LinkName);
+
 fs.readFile(process.argv[2] || 'update.json', (err, data) => {
   if (err) {
     console.error("Error reading file:", err);

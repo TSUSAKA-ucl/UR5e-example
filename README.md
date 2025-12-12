@@ -1,5 +1,28 @@
 # making Universal Robots Description for `robot-loader`
 
+Following procedures require ROS2, blender3.6, meshlab/meshlabserver and Node.js.
+To install ROS2, please refer to official ROS2 installation guide:
+https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html
+```
+sudo apt update
+sudo apt install ros-dev-tools
+sudo apt install ros-jazzy-desktop-full
+```
+The blender scripts used in the following procedures may not work
+properly with ver.4. Please **install ver.3.6**. And set a
+environtment variable `BLENDER` to the blender executable path if
+necessary. For example,
+```
+export BLENDER=~/Downloads/blender-3.6.4-linux-x64/blender
+```
+To install blender, please refer to their official websites:
+https://www.blender.org/download/lts/3-6/
+
+Meshlab and meshlabserver can be installed using apt:
+```
+sudo apt install meshlab
+```
+
 ## Creating joint information and link visualization information used in `robot-loader` and `ik-worker`
 
 This section describes how to create the `urdf.json`, `linkmap.json`,
@@ -189,8 +212,11 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
    ```
 7. create `shapes.json` file from `shapeList.json`
    ```
-   ../s/ply_loader.js shapeList.json
-   cp -p outout.json shapes.json
+   ../s/ply_loader.js shapeList.json ../linkmap.json
+   ```
+   this will generate `output.json` file. Rename it to `shapes.json`
+   ```
+   mv output.json shapes.json
    ```
    Now you have `shapes.json` file defining colliders for UR5e robot.
 8. write `testPairs.json` file for testing collision detection between links.
@@ -210,8 +236,8 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
    But if you want to visualize the colliders in `robot-loader`, you also need
    glTF files for colliders.
 10. create glTF files for colliders from the collider STL files
+	(`cd meshes/`)
     ```
-    cd meshes/
     for file in *.bbox.stl; do
       ../a/convert-to-gltf.sh "$file"
     done
@@ -221,7 +247,7 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
     ```
 	cd out
     for f in *.bbox.gltf; do
-      node ../../s/set-gltf-color.mjs "$f" --color '#ff0000' --opacity 0.2
+      node ../../s/set-gltf-color.mjs "$f" --color '#ffff00' --opacity 0.2
     done
     cd ../..
     ```
@@ -235,17 +261,22 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
 	```
 	node ./addToolColliders.js update.json wrist_3_link CONVUM_SGE-M5-N-body-m.bbox.gltf CONVUM_SGE-M5-N-suction-m.bbox.gltf
 	```
-	These commands create the same `update_with_tool.json` file.
-	Then overwrite `public/ur5e/update.json` file with it.  
+	These commands create the same `update_with_tool.json` file, then
+	make(overwrite) a compact `update.json` using `json-pretty-compact.sh` tool
+    ```
+	./a/json-pretty-compact.sh update-with-tools-collider.json -o update.json
+    ```
 	**NOTE:**  
 	Tools are not defined in `linkmap.json`, so they are written into
 	`shapes.json` and `update.json` as shapes **in the coordinate system
 	of the LINK** to which they are attached, **not in the glTF visual's origin**
 	of the link.
 
-Now you can use the created `shapes.json`, `testPairs.json` files and
-the collider glTF files with `cd-worker` and `robot-loader`.
+Now you can use the created `shapes.json`, `testPairs.json`,
+new`update.json` files and the collider glTF
+files(`./meshes/out/*.bbox.gltf`) with `cd-worker` and `robot-loader`.
 
-If the ROS robot description package does not include DAE files for visualization
-but for visualization only STL files, you can add colors to the collider glTF files
-using `set-gltf-color.mjs` tool as described above.
+If the ROS robot description package does not include DAE files for
+visualization but for visualization only STL files, you can add colors
+to the collider glTF files using `set-gltf-color.mjs` tool as
+described above.

@@ -1,9 +1,0 @@
-Mesh /home/tsusaka/Test/gjk_worker/Nova2/CONVUM_SGE-M5-N-suction-m.stl loaded has 5720 vn 11460 fn
-Mesh Bounding Box Size 0.020000  0.020000  0.103500
-Mesh Bounding Box Diag 0.107295 
-Mesh Bounding Box min -0.010000  -0.010000  0.120000
-Mesh Bounding Box max 0.010000  0.010000  0.223500
-Mesh Surface Area is 0.005949
-Mesh Total Len of 17190 Edges is 23.307072 Avg Len 0.001356
-Mesh Total Len of 17190 Edges is 23.307072 Avg Len 0.001356 (including faux edges))
-Mesh Volume  is 0.000006
