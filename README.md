@@ -99,7 +99,7 @@ This section describes how to create the `urdf.json`, `linkmap.json`,
 10. finding the shape data needed for visualization and collision from the
     link map file
     ```
-    Meshes=(`grep filename linkmap.json |sed 's/^\s*//'|sort -u | sed -e 's/^[^:]*:\s*//' -e 's/"//g'`)
+    Meshes=(`grep filename linkmap.json |sed 's/^\s*//'|sort -u | sed -e 's/^[^:]*:\s*//' -e 's/"//g' -e 's/,\s*$//g' | grep -v '/collision/'`)
     for path in "${Meshes[@]}"; do echo $path; done
     ```
     this will list up all the mesh files' ROS2 paths used in the selected chain.
