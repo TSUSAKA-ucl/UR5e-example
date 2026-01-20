@@ -1,0 +1,8 @@
+[submodule "ros2/src/sciurus17_ros"]
+	path = ros2/src/sciurus17_ros
+	url = https://github.com/rt-net/sciurus17_ros.git
+	branch = jazzy
+[submodule "ros2/src/sciurus17_description"]
+	path = ros2/src/sciurus17_description
+	url = https://github.com/rt-net/sciurus17_description.git
+	branch = jazzy
