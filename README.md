@@ -99,7 +99,9 @@ This section describes how to create the `urdf.json`, `linkmap.json`,
 10. finding the shape data needed for visualization and collision from the
     link map file
     ```
-    Meshes=(`grep filename linkmap.json |sed 's/^\s*//'|sort -u | sed -e 's/^[^:]*:\s*//' -e 's/"//g' -e 's/,\s*$//g' | grep -v '/collision/'`)
+    Meshes=(`./resolve_ros2_paths.sh | grep -v 'collision/'`)
+	```
+	```
     for path in "${Meshes[@]}"; do echo $path; done
     ```
     this will list up all the mesh files' ROS2 paths used in the selected chain.
@@ -134,15 +136,14 @@ This section describes how to create the `urdf.json`, `linkmap.json`,
     ```
     this will generate glTF files(`.gltf` and `.bin`) for each mesh file
     under `out` folder.
-13. make a compact `update.json` using `json-pretty-compact.sh` tool
-    ```
-    ./a/json-pretty-compact.sh update-stub.json -o update.json -c 90
-    ```
-    and edit `update.json` if necessary.
-
-14. finally, rename `urdfmap_cut.json` to `urdf.json` and move
+13. edit `update-stub.json` if necessary.  
+	finally, copy
     `urdf.json`, `linkmap.json`, `update.json` and files in `meshes/out/` folder
     to `public/ur5e/` folder or any other desired folder.
+	```
+	mkdir -p ur5e/public/ur5e
+	./copy-assets.sh . ur5e/public/ur5e
+	```
 
 Now you can use the created files(`urdf.json`, `linkmap.json`, `update.json`)
 and glTF mesh files  with `robot-loader` and `ik-worker`.
@@ -261,20 +262,24 @@ UR robot has the links with simple shapes, so the former way is usually sufficie
 	```
 	node ./addToolColliders.js update.json wrist_3_link CONVUM_SGE-M5-N-body-m.bbox.gltf CONVUM_SGE-M5-N-suction-m.bbox.gltf
 	```
-	These commands create the same `update_with_tool.json` file, then
-	make(overwrite) a compact `update.json` using `json-pretty-compact.sh` tool
-    ```
-	./a/json-pretty-compact.sh update-with-tools-collider.json -o update.json
-    ```
+	These commands create the same `update_with_tool.json` file.
 	**NOTE:**  
 	Tools are not defined in `linkmap.json`, so they are written into
 	`shapes.json` and `update.json` as shapes **in the coordinate system
 	of the LINK** to which they are attached, **not in the glTF visual's origin**
 	of the link.
+	
+
 
 Now you can use the created `shapes.json`, `testPairs.json`,
-new`update.json` files and the collider glTF
+new`update_with_tool.json` files and the collider glTF
 files(`./meshes/out/*.bbox.gltf`) with `cd-worker` and `robot-loader`.
+you can use `copy-assets.sh` again.
+```
+./copy-assets.sh . ur5e/public/ur5e
+```
+this copy `update_with_tool.json` to the destination directory
+and rename it to `update.json`
 
 If the ROS robot description package does not include DAE files for
 visualization but for visualization only STL files, you can add colors
