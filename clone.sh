@@ -1,6 +1,6 @@
 #!/bin/bash
 git clone --filter=blob:none --no-checkout \
-    https://github.com/TSUSAKA-ucl/gjk_worker.git
+    https://github.com/TSUSAKA-ucl/cd-config-generation.git  gjk_worker
 pushd gjk_worker/
 git sparse-checkout set scripts nodejs
 git checkout
