@@ -36,6 +36,7 @@ if [ -f "$SrcDir"/shapes.json ]; then
 else
     if [ -f "$SrcDir"/meshes/output.json ]; then
 	ln -s "$SrcDir"/meshes/output.json "$SrcDir"/shapes.json
+	"$CpCmd" "$SrcDir"/shapes.json "$DstDir"/
     fi
 fi
 #
